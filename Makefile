@@ -7,7 +7,7 @@ install:
 	$(PYTHON) -m pip install -r requirements.txt
 
 test:
-	pytest -q
+	$(PYTHON) -m pytest -q
 
 run:
 	$(PYTHON) compare_timeseries.py /path/to/file.txt --observed-pattern "ObservedColumnName"
