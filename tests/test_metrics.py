@@ -59,3 +59,24 @@ def test_make_daily_plot_writes_file(tmp_path: Path):
     )
     assert out.exists()
     assert out.suffix == ".png"
+
+
+def test_probabilistic_metrics(tmp_path: Path):
+    # Create observed and ensemble members
+    dates = ["01 Jan 2020, 00:00", "02 Jan 2020, 00:00", "03 Jan 2020, 00:00", "04 Jan 2020, 00:00"]
+    obs = [10.0, 12.0, 11.0, 13.0]
+    # create 5 ensemble members with small perturbations
+    ens = [[9.0, 10.5, 11.2, 12.8], [10.2, 12.1, 10.9, 13.3], [10.0, 11.9, 11.0, 12.7], [9.8, 12.2, 11.1, 13.0], [10.5, 12.0, 11.3, 12.9]]
+    df = pd.DataFrame({
+        "Ordinate": ["1"] * 4,
+        DEFAULT_DATE_COL: dates,
+        "Observed": obs,
+    })
+    # add ensemble member columns
+    for i, member in enumerate(ens, start=1):
+        df[f"Flow_ens_{i:03d}"] = member
+
+    df = df
+    metrics = compute_metrics(df, "Observed", [c for c in df.columns if "Flow_ens_" in c], date_col=DEFAULT_DATE_COL)
+    # ensemble summary row should exist
+    assert any(metrics["model"].astype(str).str.contains("Flow_ens"))

@@ -10,6 +10,11 @@ from scipy.stats import spearmanr
 from sklearn.metrics import mean_absolute_error, r2_score
 import difflib
 from typing import Sequence
+import re
+try:
+    from properscoring import crps_ensemble
+except Exception:  # pragma: no cover - optional
+    crps_ensemble = None
 
 
 METRIC_INFO = [
@@ -261,6 +266,71 @@ def compute_metrics(
                 "mase": mase,
                 "peak_err": peak_err,
                 "peak_timing_err_days": peak_timing_err_days,
+            }
+        )
+
+        # Attach quantile errors (per-model) as separate named fields
+        for q, err in zip(quantiles, q_err_pct):
+            qname = f"q{int(q*100)}_err_pct"
+            rows[-1][qname] = float(err) if not np.isnan(err) else float("nan")
+
+    # Detect ensemble groups by column naming convention: base_ens_001, base_ens_002, ...
+    ens_pattern = re.compile(r"(?P<base>.+)_ens_\d+$")
+    groups: dict[str, list[str]] = {}
+    for c in model_cols:
+        m = ens_pattern.match(c)
+        if m:
+            base = m.group("base")
+            groups.setdefault(base, []).append(c)
+
+    # For each ensemble group, compute probabilistic scores
+    for base, members in groups.items():
+        members_sorted = sorted(members)
+        ens_df = observed[members_sorted].dropna()
+        if ens_df.empty:
+            continue
+        y_true_e = observed.loc[ens_df.index, observed_col].to_numpy(dtype=float)
+        ens_arr = ens_df.to_numpy(dtype=float)  # shape (n_times, n_members)
+
+        # CRPS (mean over time) if properscoring available
+        if crps_ensemble is not None:
+            try:
+                crps_vals = crps_ensemble(y_true_e, ens_arr)
+                mean_crps = float(np.mean(crps_vals))
+            except Exception:
+                mean_crps = float("nan")
+        else:
+            mean_crps = float("nan")
+
+        # PICP for central 90% interval (5th-95th percentiles)
+        lower = np.percentile(ens_arr, 5, axis=1)
+        upper = np.percentile(ens_arr, 95, axis=1)
+        inside = (y_true_e >= lower) & (y_true_e <= upper)
+        picp_90 = float(100.0 * np.mean(inside))
+
+        # Interval score for 90% interval
+        alpha = 0.10
+        width = upper - lower
+        below = np.maximum(lower - y_true_e, 0.0)
+        above = np.maximum(y_true_e - upper, 0.0)
+        interval_score_90 = float(np.mean(width + (2.0 / alpha) * below + (2.0 / alpha) * above))
+
+        # Brier score for exceedance of the observed 90th percentile (threshold)
+        # Define threshold as the observed 90th percentile of y_true
+        thresh = np.percentile(y_true_e, 90)
+        obs_binary = (y_true_e > thresh).astype(float)
+        # probability that ensemble members exceed threshold
+        prob_exceed = np.mean(ens_arr > thresh, axis=1)
+        brier_90 = float(np.mean((prob_exceed - obs_binary) ** 2))
+
+        rows.append(
+            {
+                "model": f"{base}_ens",
+                "sample_n": int(len(y_true_e)),
+                "mean_crps": mean_crps,
+                "picp_90_%": picp_90,
+                "interval_score_90": interval_score_90,
+                "brier_90": brier_90,
             }
         )
 
