@@ -33,6 +33,11 @@ def test_compute_metrics_basic(tmp_path: Path):
     # expect columns for r2 and log_nse
     assert "r2" in metrics.columns
     assert "log_nse" in metrics.columns
+    # new metrics
+    assert "willmott_d" in metrics.columns
+    assert "kge_rho" in metrics.columns
+    assert "volume_err_%" in metrics.columns
+    assert "q10_err_pct" in metrics.columns
     # Model_B has zeros; log_nse should be nan for that row
     mb = metrics[metrics["model"] == "Model_B (n=4)"]
     assert mb["log_nse"].isna().all()

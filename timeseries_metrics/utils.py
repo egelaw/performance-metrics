@@ -9,6 +9,7 @@ import pandas as pd
 from scipy.stats import spearmanr
 from sklearn.metrics import mean_absolute_error, r2_score
 import difflib
+from typing import Sequence
 
 
 METRIC_INFO = [
@@ -177,6 +178,11 @@ def compute_metrics(
         else:
             kge = float("nan")
 
+        # KGE components exposed for diagnostics
+        kge_rho = pearson_r
+        kge_alpha = alpha if 'alpha' in locals() else float("nan")
+        kge_beta = beta if 'beta' in locals() else float("nan")
+
         rsr = float(np.sqrt(np.mean((y_true - y_pred) ** 2)) / obs_std) if sample_n > 1 and np.isfinite(obs_std) and obs_std != 0.0 else float("nan")
         mase = float(np.mean(np.abs(residual)) / denom_mase) if sample_n > 1 and np.isfinite(denom_mase) and denom_mase != 0.0 else float("nan")
 
@@ -198,6 +204,30 @@ def compute_metrics(
         mnse = float(1.0 - np.sum(np.abs(y_pred - y_true)) / mnse_denom) if mnse_denom != 0 else float("nan")
         rmse = float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
 
+        # Willmott's index of agreement (d)
+        denom_w = np.sum((np.abs(y_pred - np.mean(y_true)) + np.abs(y_true - np.mean(y_true))) ** 2)
+        willmott_d = float(1.0 - np.sum((y_pred - y_true) ** 2) / denom_w) if denom_w != 0 else float("nan")
+
+        # Volume / total relative error (%)
+        total_obs = float(np.sum(y_true))
+        total_pred = float(np.sum(y_pred))
+        volume_err_pct = float(100.0 * (total_pred - total_obs) / total_obs) if total_obs != 0 else float("nan")
+
+        # RMSE decomposition: systematic vs unsystematic
+        mse = float(np.mean((y_true - y_pred) ** 2))
+        mse_syst = float((np.mean(y_pred) - np.mean(y_true)) ** 2)
+        mse_unsyst = float(mse - mse_syst) if mse - mse_syst > 0 else 0.0
+        rmse_syst = float(np.sqrt(mse_syst))
+        rmse_unsyst = float(np.sqrt(mse_unsyst))
+
+        # Flow Duration Curve / quantile errors (percent error at select quantiles)
+        quantiles = [0.01, 0.05, 0.1, 0.5, 0.9, 0.95, 0.99]
+        q_obs = np.quantile(y_true, quantiles)
+        q_pred = np.quantile(y_pred, quantiles)
+        # percent error per quantile (pred-obs)/obs*100, guarded
+        with np.errstate(divide='ignore', invalid='ignore'):
+            q_err_pct = 100.0 * (q_pred - q_obs) / q_obs
+
         rows.append(
             {
                 "model": column,
@@ -218,12 +248,27 @@ def compute_metrics(
                 "pearson_r": pearson_r,
                 "spearman_rho": spearman_rho,
                 "kge": kge,
+                "kge_rho": kge_rho,
+                "kge_alpha": kge_alpha,
+                "kge_beta": kge_beta,
+                "willmott_d": willmott_d,
+                "volume_err_%": volume_err_pct,
+                "rmse_syst": rmse_syst,
+                "rmse_unsyst": rmse_unsyst,
+                "obs_std": obs_std,
+                "pred_std": pred_std,
                 "rsr": rsr,
                 "mase": mase,
                 "peak_err": peak_err,
                 "peak_timing_err_days": peak_timing_err_days,
             }
         )
+
+        # Attach quantile errors as separate named fields
+        for q, err in zip(quantiles, q_err_pct):
+            # field name like q10_err_pct for 10th percentile
+            qname = f"q{int(q*100)}_err_pct"
+            rows[-1][qname] = float(err) if not np.isnan(err) else float("nan")
 
     out = pd.DataFrame(rows)
     if out.empty:
