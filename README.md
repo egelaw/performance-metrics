@@ -55,9 +55,6 @@ Notes
 - The scripts only compare model values at timestamps where an observed daily value exists (no temporal aggregation).
 - `log-NSE` requires strictly positive values; when undefined it will be shown as `nan`.
 
-License
-- MIT-style: use as you like.
-
 **Ensembles & Probabilistic Metrics**
 
 This tool supports simple ensemble/probabilistic forecasts using a naming convention for ensemble member columns and computes several probabilistic diagnostics automatically.
@@ -94,3 +91,44 @@ python compare_timeseries.py /path/to/file.txt --observed-pattern "Observed" --o
 # The CSV output (if --metrics-out provided) will contain ensemble summary rows named Flow_ens
 # and per-model rows will include the additional quantile and diagnostic columns described above.
 ```
+
+## Metric References
+
+The implementation in `timeseries_metrics/utils.py` is annotated with source comments at the point where each metric is computed. The table below expands those references so the formula provenance is visible in the documentation as well.
+
+| Metric | Source used in code |
+| --- | --- |
+| `r2` | scikit-learn `r2_score` / coefficient of determination |
+| `nse` | Nash and Sutcliffe (1970), *Journal of Hydrology* |
+| `log_nse` | Nash and Sutcliffe (1970) on log-transformed flows; log-transform convention follows HydroEval |
+| `mnse` | Modified NSE form used in hydrologic model evaluation literature |
+| `rmse` | Standard RMSE definition; HydroEval uses the same formula |
+| `nrmse_pct` | RMSE normalized by the observed range, computed directly in this repo |
+| `mae` | Standard mean absolute error definition / scikit-learn |
+| `medae` | Standard median absolute error definition |
+| `bias` | Mean signed error; direct formula |
+| `pbias_%` | Percent bias as in HydroEval |
+| `mape_%` | Hyndman and Koehler (2006), forecast accuracy measures |
+| `smape_%` | Hyndman and Koehler (2006), symmetric MAPE family |
+| `mre_%` | Mean relative error, computed directly from the signed residuals |
+| `pearson_r` | Pearson correlation coefficient, standard definition |
+| `spearman_rho` | Spearman rank correlation coefficient, standard definition |
+| `kge` | Gupta et al. (2009), original Kling-Gupta Efficiency |
+| `kge_rho`, `kge_alpha`, `kge_beta` | Gupta et al. (2009), KGE components |
+| `rsr` | Moriasi et al. (2007), SWAT evaluation guidelines |
+| `mase` | Hyndman and Koehler (2006), Mean Absolute Scaled Error |
+| `peak_err` | Direct peak-value diagnostic computed from the matched time stamps |
+| `peak_timing_err_days` | Direct peak-timing diagnostic computed from the matched time stamps |
+| `willmott_d` | Willmott (1981), index of agreement |
+| `volume_err_%` | Direct percent volume bias from total observed vs modeled volume |
+| `rmse_syst`, `rmse_unsyst` | Direct algebraic decomposition of MSE |
+| `q10_err_pct`, `q50_err_pct`, `q90_err_pct`, etc. | Direct flow-duration-curve style quantile diagnostics |
+| `mean_crps` | Gneiting and Raftery (2007), proper scoring rules / CRPS |
+| `picp_90_%` | Prediction interval coverage computed directly from the ensemble 5th-95th percentile band |
+| `interval_score_90` | Gneiting and Raftery (2007), interval score |
+| `brier_90` | Brier (1950); threshold exceedance form follows the proper-scoring-rule literature |
+
+For the hydrologic metrics above, the code currently follows the same formulas used by the open-source HydroEval package where applicable. Metrics marked as "computed directly" are derived in this repository from standard definitions rather than copied from a third-party implementation.
+
+License
+- MIT-style: use as you like.
