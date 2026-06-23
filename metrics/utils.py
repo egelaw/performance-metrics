@@ -11,10 +11,6 @@ from sklearn.metrics import mean_absolute_error, r2_score
 import difflib
 from typing import Sequence
 import re
-try:
-    from properscoring import crps_ensemble
-except Exception:  # pragma: no cover - optional
-    crps_ensemble = None
 
 
 METRIC_INFO = [
@@ -310,21 +306,10 @@ def compute_metrics(
         y_true_e = observed.loc[ens_df.index, observed_col].to_numpy(dtype=float)
         ens_arr = ens_df.to_numpy(dtype=float)  # shape (n_times, n_members)
 
-        # CRPS (mean over time) if properscoring available.
-        # Source: https://doi.org/10.1198/016214506000001437
-        if crps_ensemble is not None:
-            try:
-                crps_vals = crps_ensemble(y_true_e, ens_arr)
-                mean_crps = float(np.mean(crps_vals))
-            except Exception:
-                mean_crps = float("nan")
-        else:
-            mean_crps = float("nan")
-
         # PICP for central 90% interval (5th-95th percentiles)
         # Interval-coverage and interval-score diagnostics follow the proper
         # scoring rule literature used for probabilistic forecast evaluation.
-        # Same source as CRPS above.
+        # Source: https://doi.org/10.1198/016214506000001437
         lower = np.percentile(ens_arr, 5, axis=1)
         upper = np.percentile(ens_arr, 95, axis=1)
         inside = (y_true_e >= lower) & (y_true_e <= upper)
@@ -350,7 +335,6 @@ def compute_metrics(
             {
                 "model": f"{base}_ens",
                 "sample_n": int(len(y_true_e)),
-                "mean_crps": mean_crps,
                 "picp_90_%": picp_90,
                 "interval_score_90": interval_score_90,
                 "brier_90": brier_90,

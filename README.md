@@ -78,7 +78,6 @@ This tool supports simple ensemble/probabilistic forecasts using a naming conven
 
 Computed probabilistic metrics (per ensemble group)
 
-- `mean_crps`: Continuous Ranked Probability Score averaged over time (lower is better). Requires the `properscoring` package; if unavailable the value will be `nan`.
 - `picp_90_%`: Prediction Interval Coverage Probability for the central 90% interval — percent of observed values inside the ensemble 5th–95th percentile interval (close to 90% is ideal for calibrated ensembles).
 - `interval_score_90`: Interval score for the 90% central prediction interval (lower is better, balances interval width and missed coverage).
 - `brier_90`: Brier score for exceedance of the observed 90th percentile (0–1, lower is better) computed from ensemble exceedance probabilities.
@@ -131,7 +130,6 @@ The implementation in `metrics/utils.py` is annotated with source comments at th
 | `volume_err_%` | Direct percent volume bias from total observed vs modeled volume |
 | `rmse_syst`, `rmse_unsyst` | Direct algebraic decomposition of MSE |
 | `q10_err_pct`, `q50_err_pct`, `q90_err_pct`, etc. | Direct flow-duration-curve style quantile diagnostics |
-| `mean_crps` | [Gneiting and Raftery (2007)](https://doi.org/10.1198/016214506000001437), proper scoring rules / CRPS |
 | `picp_90_%` | Prediction interval coverage computed directly from the ensemble 5th-95th percentile band |
 | `interval_score_90` | [Gneiting and Raftery (2007)](https://doi.org/10.1198/016214506000001437), interval score |
 | `brier_90` | [Brier (1950)](https://journals.ametsoc.org/view/journals/mwre/78/1/1520-0493_1950_078_0001_voboaf_2_0_co_2.xml); threshold-exceedance form follows the proper-scoring-rule literature |
