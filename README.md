@@ -6,7 +6,7 @@ Lightweight Python scripts for comparing observed and modeled time series, compu
 
 Files
 - `metrics/utils.py` — shared data loading, metric computations, and plotting helpers.
-- `compare_timeseries.py` — single CLI entrypoint for generic observed vs modeled comparisons.
+- `compare_timeseries.py` — main Python script for generic observed vs modeled comparisons.
 - `tests/` — unit tests for metrics and plotting.
 - `requirements.txt` — minimal dependency list for running the scripts.
 
@@ -32,7 +32,7 @@ chmod +x run.sh
 ./run.sh /path/to/file.txt --observed-pattern "ObservedColumnName"
 ```
 
-4. Or run the Python CLI directly:
+4. Or run the Python script directly:
 
 ```bash
 python compare_timeseries.py /path/to/file.txt --observed-pattern "ObservedColumnName" --output-dir tmp_plots --metrics-out tmp_plots
@@ -74,7 +74,7 @@ This tool supports simple ensemble/probabilistic forecasts using a naming conven
 	01 Jan 2020, 00:00	10.0	9.8	10.2	9.5	10.5
 	```
 
-- The tool will detect groups of columns sharing the same `<base>` (here `Flow`) and compute ensemble diagnostics for each group. No extra CLI flag is required — columns following the naming pattern are grouped automatically.
+- The tool will detect groups of columns sharing the same `<base>` (here `Flow`) and compute ensemble diagnostics for each group. No extra flag is required — columns following the naming pattern are grouped automatically.
 
 Computed probabilistic metrics (per ensemble group)
 
@@ -90,7 +90,7 @@ Per-model diagnostics
 - `volume_err_%`: Percent error in total/volume between predicted and observed (useful for water-balance focused applications).
 - `q10_err_pct`, `q50_err_pct`, `q90_err_pct`, etc.: Percent errors at selected quantiles (Flow Duration Curve errors) to evaluate behavior across low/median/high regimes.
 
-Example: running the CLI with ensemble columns
+Example: running the script with ensemble columns
 
 ```bash
 # example CSV has columns: Date / Time, Observed, Flow_ens_001, Flow_ens_002, ...
