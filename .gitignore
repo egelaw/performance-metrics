@@ -1,0 +1,10 @@
+/.venv/
+tmp_plots/
+*.png
+__pycache__/
+.pytest_cache/
+.vscode/
+*.pyc
+dist/
+build/
+*.egg-info/
