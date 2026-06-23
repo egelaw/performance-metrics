@@ -1,7 +1,8 @@
-"""Example: stage comparison helper (migrated from legacy script).
+"""Example: stage/time-series comparison helper (generic).
 
-This is provided as an example for how to call the generic comparator utilities
-against a tab-separated timeseries file. It is NOT required for the core library.
+Shows how to call the core utilities with a simple file path and observed
+column name placeholder. Replace `DATA_PATH` and `ObservedColumnName` with
+your actual values.
 """
 from pathlib import Path
 
@@ -15,7 +16,15 @@ def main():
     df, observed_col, model_cols = load_data(DATA_PATH, observed_pattern="ObservedColumnName")
     metrics = compute_metrics(df, observed_col, model_cols)
     print(format_grouped_metrics(metrics))
-    make_daily_plot(df, observed_col, model_cols, title="Stage", ylabel="units", observed_label="Observed", plot_name="stage_plot.png")
+    make_daily_plot(
+        df,
+        observed_col,
+        model_cols,
+        title="Stage",
+        ylabel="units",
+        observed_label="Observed",
+        plot_name="stage_plot.png",
+    )
 
 
 if __name__ == "__main__":
