@@ -5,7 +5,7 @@
 Lightweight Python scripts for comparing observed and modeled time series, computing standard performance metrics, and generating daily plots.
 
 Files
-- `timeseries_metrics/utils.py` — shared data loading, metric computations, and plotting helpers.
+- `metrics/utils.py` — shared data loading, metric computations, and plotting helpers.
 - `compare_timeseries.py` — single CLI entrypoint for generic observed vs modeled comparisons.
 - `tests/` — unit tests for metrics and plotting.
 - `requirements.txt` — minimal dependency list for running the scripts.
@@ -95,14 +95,14 @@ python compare_timeseries.py /path/to/file.txt --observed-pattern "Observed" --o
 
 ## Metric References
 
-The implementation in `timeseries_metrics/utils.py` is annotated with source comments at the point where each metric is computed. The table below expands those references so the formula provenance is visible in the documentation as well.
+The implementation in `metrics/utils.py` is annotated with source comments at the point where each metric is computed. The table below expands those references so the formula provenance is visible in the documentation as well.
 
 | Metric | Source used in code |
 | --- | --- |
 | `r2` | [scikit-learn `r2_score`](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html) / coefficient of determination |
 | `nse` | [Nash and Sutcliffe (1970)](https://doi.org/10.1016/0022-1694(70)90255-6), *Journal of Hydrology* |
 | `log_nse` | [Nash and Sutcliffe (1970)](https://doi.org/10.1016/0022-1694(70)90255-6) on log-transformed flows; the log-transform convention follows [HydroEval](https://thibhlln.github.io/hydroeval/) |
-| `mnse` | Direct modified-NSE form used in hydrologic model evaluation; see the implementation comments in [timeseries_metrics/utils.py](timeseries_metrics/utils.py) |
+| `mnse` | Direct modified-NSE form used in hydrologic model evaluation; see the implementation comments in [metrics/utils.py](metrics/utils.py) |
 | `rmse` | Standard RMSE definition; matches [HydroEval](https://thibhlln.github.io/hydroeval/) |
 | `nrmse_pct` | RMSE normalized by the observed range, computed directly in this repo |
 | `mae` | [scikit-learn mean absolute error](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html) |

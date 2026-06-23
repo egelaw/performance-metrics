@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from timeseries_metrics.utils import (
+from metrics.utils import (
     DEFAULT_DATE_COL,
     compute_metrics,
     make_daily_plot,

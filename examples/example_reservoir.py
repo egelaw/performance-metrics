@@ -1,7 +1,7 @@
 """Example: reservoir/time-series comparison helper (generic)."""
 from pathlib import Path
 
-from timeseries_metrics.utils import load_data, compute_metrics, format_grouped_metrics, make_daily_plot
+from metrics.utils import load_data, compute_metrics, format_grouped_metrics, make_daily_plot
 
 
 DATA_PATH = Path("/path/to/your/data/reservoir_file.txt")

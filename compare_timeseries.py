@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 import logging
 
-from timeseries_metrics.utils import (
+from metrics.utils import (
     LOG_NSE_NOTE,
     compute_metrics,
     format_grouped_metrics,
@@ -84,7 +84,7 @@ def main() -> None:
             if metrics_out.is_dir():
                 metrics_fname = f"{output_prefix + '_metrics' if output_prefix else 'metrics'}.csv"
                 metrics_out = metrics_out / metrics_fname
-            from timeseries_metrics.utils import write_metrics_csv
+            from metrics.utils import write_metrics_csv
 
             written = write_metrics_csv(metrics, metrics_out)
             print(f"Saved metrics CSV to: {written}")
