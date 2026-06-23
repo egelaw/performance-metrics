@@ -153,9 +153,9 @@ def compute_metrics(
         if sample_n == 0:
             continue
 
-        # Deterministic scalar error metrics are implemented from the
-        # standard hydrologic definitions used by HydroEval and related
-        # forecast-skill references.
+        # Deterministic scalar error metrics follow the standard hydrologic
+        # definitions used by HydroEval and related forecast-skill references.
+        # NSE/KGE/PBias/RMSE source links are listed in the README.
         residual = y_pred - y_true
         ss_res = float(np.sum((y_true - y_pred) ** 2))
         ss_tot = float(np.sum((y_true - np.mean(y_true)) ** 2))
@@ -176,11 +176,13 @@ def compute_metrics(
             log_ss_res = float(np.sum((log_y_true - log_y_pred) ** 2))
             log_ss_tot = float(np.sum((log_y_true - np.mean(log_y_true)) ** 2))
             # NSE on log-transformed flows follows the HydroEval log-transform
-            # convention and the original Nash-Sutcliffe efficiency definition.
+            # convention and the original Nash-Sutcliffe definition:
+            # https://doi.org/10.1016/0022-1694(70)90255-6
             log_nse = float(1.0 - log_ss_res / log_ss_tot) if log_ss_tot != 0 else float("nan")
 
         # Pearson and Spearman correlations, and KGE, follow standard
         # correlation/efficiency definitions used in hydrologic evaluation.
+        # KGE source: https://doi.org/10.1016/j.jhydrol.2009.08.003
         pearson_r = float(np.corrcoef(y_true, y_pred)[0, 1]) if sample_n > 1 else float("nan")
         spearman_rho = float(spearmanr(y_true, y_pred).correlation) if sample_n > 1 else float("nan")
         if sample_n > 1 and np.isfinite(pearson_r) and np.isfinite(obs_std) and np.isfinite(pred_std) and obs_std != 0.0 and obs_mean != 0.0:
@@ -205,6 +207,7 @@ def compute_metrics(
 
         # mNSE, RMSE, and related error summaries use the same deterministic
         # error series and are kept here as direct formula implementations.
+        # MAPE/SMAPE/MASE reference: https://doi.org/10.1016/j.ijforecast.2006.03.001
         with np.errstate(divide="ignore", invalid="ignore"):
             mape_values = np.where(zero_mask, np.abs((y_true - y_pred) / y_true) * 100.0, np.nan)
             mre_values = np.where(zero_mask, ((y_pred - y_true) / y_true) * 100.0, np.nan)
@@ -219,14 +222,13 @@ def compute_metrics(
         rmse = float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
 
         # Willmott's index of agreement (d)
-        # Source: Willmott (1981), as commonly used in hydrologic model
-        # evaluation literature.
+        # Source: https://doi.org/10.1175/1520-0450(1981)020%3C1201%3AIOAOTM%3E2.0.CO;2
         denom_w = np.sum((np.abs(y_pred - np.mean(y_true)) + np.abs(y_true - np.mean(y_true))) ** 2)
         willmott_d = float(1.0 - np.sum((y_pred - y_true) ** 2) / denom_w) if denom_w != 0 else float("nan")
 
         # Volume / total relative error (%)
         # Direct percent volume bias from the cumulative observed and modeled
-        # series; no external package-specific formula is required.
+        # series; HydroEval uses the same percent-bias definition.
         total_obs = float(np.sum(y_true))
         total_pred = float(np.sum(y_pred))
         volume_err_pct = float(100.0 * (total_pred - total_obs) / total_obs) if total_obs != 0 else float("nan")
@@ -308,8 +310,8 @@ def compute_metrics(
         y_true_e = observed.loc[ens_df.index, observed_col].to_numpy(dtype=float)
         ens_arr = ens_df.to_numpy(dtype=float)  # shape (n_times, n_members)
 
-        # CRPS (mean over time) if properscoring available
-        # Source: Gneiting & Raftery (2007); implemented via properscoring.
+        # CRPS (mean over time) if properscoring available.
+        # Source: https://doi.org/10.1198/016214506000001437
         if crps_ensemble is not None:
             try:
                 crps_vals = crps_ensemble(y_true_e, ens_arr)
@@ -322,6 +324,7 @@ def compute_metrics(
         # PICP for central 90% interval (5th-95th percentiles)
         # Interval-coverage and interval-score diagnostics follow the proper
         # scoring rule literature used for probabilistic forecast evaluation.
+        # Same source as CRPS above.
         lower = np.percentile(ens_arr, 5, axis=1)
         upper = np.percentile(ens_arr, 95, axis=1)
         inside = (y_true_e >= lower) & (y_true_e <= upper)
@@ -335,8 +338,7 @@ def compute_metrics(
         interval_score_90 = float(np.mean(width + (2.0 / alpha) * below + (2.0 / alpha) * above))
 
         # Brier score for exceedance of the observed 90th percentile (threshold)
-        # Source: Brier (1950) / threshold-exceedance scoring as implemented
-        # by properscoring and discussed in the proper-scoring-rule literature.
+        # Source: https://journals.ametsoc.org/view/journals/mwre/78/1/1520-0493_1950_078_0001_voboaf_2_0_co_2.xml
         # Define threshold as the observed 90th percentile of y_true
         thresh = np.percentile(y_true_e, 90)
         obs_binary = (y_true_e > thresh).astype(float)

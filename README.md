@@ -98,35 +98,35 @@ The implementation in `timeseries_metrics/utils.py` is annotated with source com
 
 | Metric | Source used in code |
 | --- | --- |
-| `r2` | scikit-learn `r2_score` / coefficient of determination |
-| `nse` | Nash and Sutcliffe (1970), *Journal of Hydrology* |
-| `log_nse` | Nash and Sutcliffe (1970) on log-transformed flows; log-transform convention follows HydroEval |
-| `mnse` | Modified NSE form used in hydrologic model evaluation literature |
-| `rmse` | Standard RMSE definition; HydroEval uses the same formula |
+| `r2` | [scikit-learn `r2_score`](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html) / coefficient of determination |
+| `nse` | [Nash and Sutcliffe (1970)](https://doi.org/10.1016/0022-1694(70)90255-6), *Journal of Hydrology* |
+| `log_nse` | [Nash and Sutcliffe (1970)](https://doi.org/10.1016/0022-1694(70)90255-6) on log-transformed flows; the log-transform convention follows [HydroEval](https://thibhlln.github.io/hydroeval/) |
+| `mnse` | Direct modified-NSE form used in hydrologic model evaluation; see the implementation comments in [timeseries_metrics/utils.py](timeseries_metrics/utils.py) |
+| `rmse` | Standard RMSE definition; matches [HydroEval](https://thibhlln.github.io/hydroeval/) |
 | `nrmse_pct` | RMSE normalized by the observed range, computed directly in this repo |
-| `mae` | Standard mean absolute error definition / scikit-learn |
-| `medae` | Standard median absolute error definition |
+| `mae` | [scikit-learn mean absolute error](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_absolute_error.html) |
+| `medae` | [scikit-learn median absolute error](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.median_absolute_error.html) |
 | `bias` | Mean signed error; direct formula |
-| `pbias_%` | Percent bias as in HydroEval |
-| `mape_%` | Hyndman and Koehler (2006), forecast accuracy measures |
-| `smape_%` | Hyndman and Koehler (2006), symmetric MAPE family |
+| `pbias_%` | Percent bias as in [HydroEval](https://thibhlln.github.io/hydroeval/) |
+| `mape_%` | [Hyndman and Koehler (2006)](https://doi.org/10.1016/j.ijforecast.2006.03.001), forecast accuracy measures |
+| `smape_%` | [Hyndman and Koehler (2006)](https://doi.org/10.1016/j.ijforecast.2006.03.001), symmetric MAPE family |
 | `mre_%` | Mean relative error, computed directly from the signed residuals |
-| `pearson_r` | Pearson correlation coefficient, standard definition |
-| `spearman_rho` | Spearman rank correlation coefficient, standard definition |
-| `kge` | Gupta et al. (2009), original Kling-Gupta Efficiency |
-| `kge_rho`, `kge_alpha`, `kge_beta` | Gupta et al. (2009), KGE components |
-| `rsr` | Moriasi et al. (2007), SWAT evaluation guidelines |
-| `mase` | Hyndman and Koehler (2006), Mean Absolute Scaled Error |
+| `pearson_r` | [Pearson correlation coefficient](https://docs.scipy.org/doc/numpy/reference/generated/numpy.corrcoef.html), standard definition |
+| `spearman_rho` | [Spearman rank correlation coefficient](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.spearmanr.html), standard definition |
+| `kge` | [Gupta et al. (2009)](https://doi.org/10.1016/j.jhydrol.2009.08.003), original Kling-Gupta Efficiency |
+| `kge_rho`, `kge_alpha`, `kge_beta` | [Gupta et al. (2009)](https://doi.org/10.1016/j.jhydrol.2009.08.003), KGE components |
+| `rsr` | [Moriasi et al. (2007)](https://doi.org/10.13031/2013.23153), SWAT evaluation guidelines |
+| `mase` | [Hyndman and Koehler (2006)](https://doi.org/10.1016/j.ijforecast.2006.03.001), Mean Absolute Scaled Error |
 | `peak_err` | Direct peak-value diagnostic computed from the matched time stamps |
 | `peak_timing_err_days` | Direct peak-timing diagnostic computed from the matched time stamps |
-| `willmott_d` | Willmott (1981), index of agreement |
+| `willmott_d` | [Willmott (1981)](https://doi.org/10.1175/1520-0450(1981)020%3C1201%3AIOAOTM%3E2.0.CO;2), index of agreement |
 | `volume_err_%` | Direct percent volume bias from total observed vs modeled volume |
 | `rmse_syst`, `rmse_unsyst` | Direct algebraic decomposition of MSE |
 | `q10_err_pct`, `q50_err_pct`, `q90_err_pct`, etc. | Direct flow-duration-curve style quantile diagnostics |
-| `mean_crps` | Gneiting and Raftery (2007), proper scoring rules / CRPS |
+| `mean_crps` | [Gneiting and Raftery (2007)](https://doi.org/10.1198/016214506000001437), proper scoring rules / CRPS |
 | `picp_90_%` | Prediction interval coverage computed directly from the ensemble 5th-95th percentile band |
-| `interval_score_90` | Gneiting and Raftery (2007), interval score |
-| `brier_90` | Brier (1950); threshold exceedance form follows the proper-scoring-rule literature |
+| `interval_score_90` | [Gneiting and Raftery (2007)](https://doi.org/10.1198/016214506000001437), interval score |
+| `brier_90` | [Brier (1950)](https://journals.ametsoc.org/view/journals/mwre/78/1/1520-0493_1950_078_0001_voboaf_2_0_co_2.xml); threshold-exceedance form follows the proper-scoring-rule literature |
 
 For the hydrologic metrics above, the code currently follows the same formulas used by the open-source HydroEval package where applicable. Metrics marked as "computed directly" are derived in this repository from standard definitions rather than copied from a third-party implementation.
 
