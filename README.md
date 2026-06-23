@@ -33,7 +33,7 @@ python compare_timeseries.py /path/to/file.txt --observed-pattern "ObservedColum
 4. Or run with a custom file and options:
 
 ```bash
-python compare_model.py /path/to/file.txt --observed-pattern "Elevatoin_datum_adjusted" --plot-name myplot.png
+python compare_timeseries.py /path/to/file.txt --observed-pattern "ObservedColumnName" --plot-name myplot.png
 ```
 
 Additional options

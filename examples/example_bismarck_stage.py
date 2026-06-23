@@ -12,7 +12,7 @@ DATA_PATH = Path("/path/to/your/data/stage_file.txt")
 
 
 def main():
-    df, observed_col, model_cols = load_data(DATA_PATH, observed_pattern="Elevatoin_datum_adjusted")
+    df, observed_col, model_cols = load_data(DATA_PATH, observed_pattern="ObservedColumnName")
     metrics = compute_metrics(df, observed_col, model_cols)
     print(format_grouped_metrics(metrics))
     make_daily_plot(df, observed_col, model_cols, title="Stage", ylabel="units", observed_label="Observed", plot_name="stage_plot.png")
