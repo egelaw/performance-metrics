@@ -2,12 +2,13 @@
 
 [![License](https://img.shields.io/github/license/egelaw/performance-metrics)](LICENSE)
 
-Small utilities to compare an observed time series against modeled/estimated time series and produce performance metrics and a daily plot.
+Lightweight Python scripts for comparing observed and modeled time series, computing standard performance metrics, and generating daily plots.
 
 Files
 - `timeseries_metrics/utils.py` — shared data loading, metric computations, and plotting helpers.
 - `compare_timeseries.py` — single CLI entrypoint for generic observed vs modeled comparisons.
 - `tests/` — unit tests for metrics and plotting.
+- `requirements.txt` — minimal dependency list for running the scripts.
 
 Quick start
 
