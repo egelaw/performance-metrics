@@ -25,16 +25,23 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Run the generic comparator:
+3. Run using the shell wrapper (simplest):
+
+```bash
+chmod +x run.sh
+./run.sh /path/to/file.txt --observed-pattern "ObservedColumnName"
+```
+
+4. Or run the Python CLI directly:
 
 ```bash
 python compare_timeseries.py /path/to/file.txt --observed-pattern "ObservedColumnName" --output-dir tmp_plots --metrics-out tmp_plots
 ```
 
-4. Or run with a custom file and options:
+5. Run with custom options:
 
 ```bash
-python compare_timeseries.py /path/to/file.txt --observed-pattern "ObservedColumnName" --plot-name myplot.png
+./run.sh /path/to/file.txt --observed-pattern "ObservedColumnName" --plot-name myplot.png
 ```
 
 Additional options
