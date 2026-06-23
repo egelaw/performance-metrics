@@ -1,5 +1,7 @@
 # Time Series Metrics Comparator
 
+[![License](https://img.shields.io/github/license/egelaw/performance-metrics)](LICENSE) [![CI](https://github.com/egelaw/performance-metrics/actions/workflows/ci.yml/badge.svg)](https://github.com/egelaw/performance-metrics/actions)
+
 Small utilities to compare an observed time series against modeled/estimated time series and produce performance metrics and a daily plot.
 
 Files
