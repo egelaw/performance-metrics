@@ -16,7 +16,6 @@ import re
 METRIC_INFO = [
     {"metric": "r2", "label": "R2", "ideal": 1.0, "direction": "higher"},
     {"metric": "nse", "label": "NSE", "ideal": 1.0, "direction": "higher"},
-    {"metric": "log_nse", "label": "log-NSE", "ideal": 1.0, "direction": "higher"},
     {"metric": "mnse", "label": "mNSE", "ideal": 1.0, "direction": "higher"},
     {"metric": "rmse", "label": "RMSE", "ideal": 0.0, "direction": "lower"},
     {"metric": "nrmse_pct", "label": "NRMSE %", "ideal": 0.0, "direction": "lower"},
@@ -36,7 +35,6 @@ METRIC_INFO = [
     {"metric": "peak_timing_err_days", "label": "Peak Timing Days", "ideal": 0.0, "direction": "closer to 0"},
 ]
 
-LOG_NSE_NOTE = "Note: log-NSE is only defined when observed and modeled values are positive; otherwise it is shown as nan."
 DEFAULT_DATE_COL = "   Date / Time"
 
 
@@ -165,17 +163,6 @@ def compute_metrics(
         abs_pred = np.abs(y_pred)
         zero_mask = abs_obs != 0
 
-        log_nse = float("nan")
-        if np.all(y_true > 0) and np.all(y_pred > 0):
-            log_y_true = np.log(y_true)
-            log_y_pred = np.log(y_pred)
-            log_ss_res = float(np.sum((log_y_true - log_y_pred) ** 2))
-            log_ss_tot = float(np.sum((log_y_true - np.mean(log_y_true)) ** 2))
-            # NSE on log-transformed flows follows the HydroEval log-transform
-            # convention and the original Nash-Sutcliffe definition:
-            # https://doi.org/10.1016/0022-1694(70)90255-6
-            log_nse = float(1.0 - log_ss_res / log_ss_tot) if log_ss_tot != 0 else float("nan")
-
         # Pearson and Spearman correlations, and KGE, follow standard
         # correlation/efficiency definitions used in hydrologic evaluation.
         # KGE source: https://doi.org/10.1016/j.jhydrol.2009.08.003
@@ -253,7 +240,6 @@ def compute_metrics(
                 "sample_n": sample_n,
                 "r2": float(r2_score(y_true, y_pred)) if sample_n > 1 and ss_tot != 0 else float("nan"),
                 "nse": float(1.0 - ss_res / ss_tot) if ss_tot != 0 else float("nan"),
-                "log_nse": log_nse,
                 "mnse": mnse,
                 "rmse": rmse,
                 "nrmse_pct": float(100.0 * rmse / denom_range) if denom_range != 0 else float("nan"),

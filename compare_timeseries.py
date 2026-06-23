@@ -6,7 +6,6 @@ from typing import Optional
 import logging
 
 from metrics.utils import (
-    LOG_NSE_NOTE,
     compute_metrics,
     format_grouped_metrics,
     format_metric_legend,
@@ -60,8 +59,6 @@ def main() -> None:
         metrics = compute_metrics(df, observed_col, model_cols)
 
         print(format_metric_legend().to_string(index=False, float_format=lambda x: f"{x:0.4f}"))
-        print()
-        print(LOG_NSE_NOTE)
         print()
         print(format_grouped_metrics(metrics))
 

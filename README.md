@@ -61,7 +61,6 @@ pytest -q
 
 Notes
 - The scripts only compare model values at timestamps where an observed daily value exists (no temporal aggregation).
-- `log-NSE` requires strictly positive values; when undefined it will be shown as `nan`.
 
 **Ensembles & Probabilistic Metrics**
 
@@ -107,7 +106,6 @@ The implementation in `metrics/utils.py` is annotated with source comments at th
 | --- | --- |
 | `r2` | [scikit-learn `r2_score`](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html) / coefficient of determination |
 | `nse` | [Nash and Sutcliffe (1970)](https://doi.org/10.1016/0022-1694(70)90255-6), *Journal of Hydrology* |
-| `log_nse` | [Nash and Sutcliffe (1970)](https://doi.org/10.1016/0022-1694(70)90255-6) on log-transformed flows; the log-transform convention follows [HydroEval](https://thibhlln.github.io/hydroeval/) |
 | `mnse` | Direct modified-NSE form used in hydrologic model evaluation; see the implementation comments in [metrics/utils.py](metrics/utils.py) |
 | `rmse` | Standard RMSE definition; matches [HydroEval](https://thibhlln.github.io/hydroeval/) |
 | `nrmse_pct` | RMSE normalized by the observed range, computed directly in this repo |
